@@ -21,7 +21,6 @@ flatpickr(timerInputReff, {
   time_24hr: true,
   defaultDate: new Date(),
   minuteIncrement: 1,
-  enableSeconds: true,
   onClose(selectedDates) {
     chosenDate = selectedDates[0];
     ChosenDateCheck();
@@ -60,16 +59,12 @@ function timerCountStep() {
 }
 
 function makeEnabled(el, ...els) {
-  //   const elemets = [el, ...els];
-
   [el, ...els].forEach(el => {
     el.removeAttribute('disabled');
   });
 }
 
 function makeDisabled(el, ...els) {
-  //   const elemets = [el, ...els];
-
   [el, ...els].forEach(el => {
     el.setAttribute('disabled', 'disabled');
   });
