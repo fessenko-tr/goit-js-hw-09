@@ -1,10 +1,10 @@
 import flatpickr from 'flatpickr';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
-
 import 'flatpickr/dist/flatpickr.min.css';
 
 const timerInputReff = document.querySelector('#datetime-picker');
 const btnStartReff = document.querySelector('[data-start]');
+const FAILURE_MESSAGE = 'Please choose a date in the future';
 
 const timerTextRefs = {
   days: document.querySelector('[data-days]'),
@@ -14,9 +14,9 @@ const timerTextRefs = {
 };
 
 let chosenDate = null;
-let intId = null;
+let intervalId = null;
 
-const options = {
+flatpickr(timerInputReff, {
   enableTime: true,
   time_24hr: true,
   defaultDate: new Date(),
@@ -24,44 +24,55 @@ const options = {
   enableSeconds: true,
   onClose(selectedDates) {
     chosenDate = selectedDates[0];
-    if (isChosenTimeCorrect()) {
-      btnStartReff.removeAttribute('disabled');
-    } else {
-      btnStartReff.setAttribute('disabled', 'disabled');
-      Notify.failure('Please choose a date in the future');
-    }
+    ChosenDateCheck();
   },
-};
-
-const fp = flatpickr(timerInputReff, options);
-
-btnStartReff.addEventListener('click', () => {
-  intId = setInterval(timerCount, 1000);
 });
 
-function timerCount() {
-  const howMuc = countRemainingTime();
+btnStartReff.addEventListener('click', startTimer);
 
-  if (howMuc >= 0) {
-    updateTimerText(convertMs(howMuc));
-    btnStartReff.setAttribute('disabled', 'disabled');
-    timerInputReff.setAttribute('disabled', 'disabled');
+function ChosenDateCheck() {
+  if (countRemainingTime(chosenDate) > 0) {
+    makeEnabled(btnStartReff);
   } else {
-    timerInputReff.removeAttribute('disabled');
-    clearInterval(intId);
+    makeDisabled(btnStartReff);
+    Notify.failure(FAILURE_MESSAGE);
   }
 }
 
-function isChosenTimeCorrect() {
-  return countRemainingTime() > 0;
+function countRemainingTime(date) {
+  return Date.parse(date) - Date.parse(new Date());
 }
 
-function addLeadingZero(value) {
-  return value.toString().padStart(2, '0');
+function startTimer() {
+  makeDisabled(btnStartReff, timerInputReff);
+  intervalId = setInterval(timerCountStep, 1000);
 }
 
-function countRemainingTime() {
-  return Date.parse(chosenDate) - Date.parse(new Date());
+function timerCountStep() {
+  const remainingTime = countRemainingTime(chosenDate);
+
+  if (remainingTime >= 0) {
+    updateTimerText(convertMs(remainingTime));
+  } else {
+    makeEnabled(timerInputReff);
+    clearInterval(intervalId);
+  }
+}
+
+function makeEnabled(el, ...els) {
+  //   const elemets = [el, ...els];
+
+  [el, ...els].forEach(el => {
+    el.removeAttribute('disabled');
+  });
+}
+
+function makeDisabled(el, ...els) {
+  //   const elemets = [el, ...els];
+
+  [el, ...els].forEach(el => {
+    el.setAttribute('disabled', 'disabled');
+  });
 }
 
 function updateTimerText({ days, hours, minutes, seconds }) {
@@ -69,6 +80,10 @@ function updateTimerText({ days, hours, minutes, seconds }) {
   timerTextRefs.hours.textContent = addLeadingZero(hours);
   timerTextRefs.minutes.textContent = addLeadingZero(minutes);
   timerTextRefs.seconds.textContent = addLeadingZero(seconds);
+}
+
+function addLeadingZero(value) {
+  return value.toString().padStart(2, '0');
 }
 
 function convertMs(ms) {
