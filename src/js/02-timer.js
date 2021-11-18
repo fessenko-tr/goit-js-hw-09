@@ -2,8 +2,8 @@ import flatpickr from 'flatpickr';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import 'flatpickr/dist/flatpickr.min.css';
 
-const timerInputReff = document.querySelector('#datetime-picker');
-const btnStartReff = document.querySelector('[data-start]');
+const timerInputRef = document.querySelector('#datetime-picker');
+const btnStartRef = document.querySelector('[data-start]');
 const FAILURE_MESSAGE = 'Please choose a date in the future';
 
 const timerTextRefs = {
@@ -16,7 +16,7 @@ const timerTextRefs = {
 let chosenDate = null;
 let intervalId = null;
 
-flatpickr(timerInputReff, {
+flatpickr(timerInputRef, {
   enableTime: true,
   time_24hr: true,
   defaultDate: new Date(),
@@ -27,13 +27,13 @@ flatpickr(timerInputReff, {
   },
 });
 
-btnStartReff.addEventListener('click', startTimer);
+btnStartRef.addEventListener('click', startTimer);
 
 function ChosenDateCheck() {
   if (countRemainingTime(chosenDate) > 0) {
-    makeEnabled(btnStartReff);
+    makeEnabled(btnStartRef);
   } else {
-    makeDisabled(btnStartReff);
+    makeDisabled(btnStartRef);
     Notify.failure(FAILURE_MESSAGE);
   }
 }
@@ -43,7 +43,7 @@ function countRemainingTime(date) {
 }
 
 function startTimer() {
-  makeDisabled(btnStartReff, timerInputReff);
+  makeDisabled(btnStartRef, timerInputRef);
   intervalId = setInterval(timerCountStep, 1000);
 }
 
@@ -53,7 +53,7 @@ function timerCountStep() {
   if (remainingTime >= 0) {
     updateTimerText(convertMs(remainingTime));
   } else {
-    makeEnabled(timerInputReff);
+    makeEnabled(timerInputRef);
     clearInterval(intervalId);
   }
 }
