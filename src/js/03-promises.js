@@ -15,6 +15,7 @@ const inputRefs = {
 btnSubmitRef.addEventListener('click', runPromises);
 
 function runPromises(e) {
+  e.preventDefault();
   readDataFromInputs();
   toggleButton();
 
